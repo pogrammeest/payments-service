@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     outbox_batch_size: int = 100
 
     max_attempts: int = 3  # всего попыток, включая первую
+    # сколько сообщений consumer держит в обработке одновременно; меньше пула БД (5 + 10)
+    consumer_prefetch: int = 10
 
 
 @lru_cache

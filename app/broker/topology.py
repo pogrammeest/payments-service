@@ -4,7 +4,7 @@ payments (direct) --payments.new--> payments.new --(reject)--> payments.dlx --> 
 payments (direct) --payments.retry.Ns--> payments.retry.Ns --(TTL expired)--> payments --> payments.new
 """
 
-from faststream.rabbit import ExchangeType, RabbitBroker, RabbitExchange, RabbitQueue
+from faststream.rabbit import Channel, ExchangeType, RabbitBroker, RabbitExchange, RabbitQueue
 
 from app.core.config import get_settings
 
@@ -52,7 +52,11 @@ def retry_queue(attempt: int) -> RabbitQueue:
     )
 
 
-broker = RabbitBroker(get_settings().rabbit_url, publisher_confirms=True)
+# prefetch ограничивает число платежей в обработке: каждый держит соединение из пула БД
+broker = RabbitBroker(
+    get_settings().rabbit_url,
+    default_channel=Channel(prefetch_count=get_settings().consumer_prefetch, publisher_confirms=True),
+)
 
 
 async def declare_topology(broker: RabbitBroker) -> None:
