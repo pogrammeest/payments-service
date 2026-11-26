@@ -62,7 +62,11 @@ def test_missing_idempotency_key_returns_422(client):
     assert response.status_code == 422
 
 
-@pytest.mark.parametrize("field,value", [("amount", "0"), ("amount", "1.001"), ("currency", "GBP")])
+@pytest.mark.parametrize(
+    "field,value",
+    [("amount", "0"), ("amount", "1.001"), ("currency", "GBP"), ("metadata", {"blob": "x" * 20_000})],
+    ids=["zero-amount", "three-decimals", "unknown-currency", "oversized-metadata"],
+)
 def test_invalid_body_returns_422(client, field, value):
     response = client.post("/api/v1/payments", json={**BODY, field: value}, headers=HEADERS)
     assert response.status_code == 422

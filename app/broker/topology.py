@@ -52,10 +52,14 @@ def retry_queue(attempt: int) -> RabbitQueue:
     )
 
 
-# prefetch ограничивает число платежей в обработке: каждый держит соединение из пула БД
+_settings = get_settings()
+
+# prefetch ограничивает число платежей в обработке: каждый держит соединение из пула БД.
+# graceful_timeout: при остановке ждём текущие обработчики, худший случай это таймаут шлюза и webhook.
 broker = RabbitBroker(
-    get_settings().rabbit_url,
-    default_channel=Channel(prefetch_count=get_settings().consumer_prefetch, publisher_confirms=True),
+    _settings.rabbit_url,
+    default_channel=Channel(prefetch_count=_settings.consumer_prefetch, publisher_confirms=True),
+    graceful_timeout=_settings.gateway_timeout + _settings.webhook_timeout,
 )
 
 

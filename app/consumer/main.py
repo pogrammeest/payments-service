@@ -98,10 +98,16 @@ async def start_relay() -> None:
 
 
 @app.on_shutdown
-async def shutdown() -> None:
+async def stop_relay() -> None:
     if _relay_task is not None:
         _relay_task.cancel()
         with contextlib.suppress(asyncio.CancelledError):
             await _relay_task
+
+
+@app.after_shutdown
+async def close_clients() -> None:
+    # после остановки брокера: к этому моменту он дождался текущих обработчиков (graceful_timeout),
+    # и запрос к шлюзу не обрывается посреди списания
     await gateway.close()
     await webhook.close()

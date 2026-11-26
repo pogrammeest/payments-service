@@ -74,6 +74,7 @@ services:
     build: .
     command: faststream run app.consumer.main:app
     restart: unless-stopped
+    stop_grace_period: 20s  # consumer дожидается текущих платежей (до 15 с)
     environment: *app-env
     depends_on:
       api:
