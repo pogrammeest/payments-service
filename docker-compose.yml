@@ -38,6 +38,7 @@ services:
   gateway-mock:
     build: .
     command: uvicorn gateway_mock.main:app --host 0.0.0.0 --port 8001
+    restart: unless-stopped
     environment:
       GATEWAY_SUCCESS_RATE: ${GATEWAY_SUCCESS_RATE:-0.9}
       GATEWAY_ERROR_RATE: ${GATEWAY_ERROR_RATE:-0.0}
@@ -54,6 +55,7 @@ services:
   api:
     build: .
     command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    restart: unless-stopped
     environment: *app-env
     ports:
       - "8000:8000"
@@ -71,6 +73,7 @@ services:
   consumer:
     build: .
     command: faststream run app.consumer.main:app
+    restart: unless-stopped
     environment: *app-env
     depends_on:
       api:
