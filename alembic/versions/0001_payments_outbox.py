@@ -4,6 +4,7 @@ Revision ID: 0001
 Revises:
 Create Date: 2026-11-25
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa
@@ -16,9 +17,7 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 currency = postgresql.ENUM("RUB", "USD", "EUR", name="currency", create_type=False)
-payment_status = postgresql.ENUM(
-    "pending", "succeeded", "failed", name="payment_status", create_type=False
-)
+payment_status = postgresql.ENUM("pending", "succeeded", "failed", name="payment_status", create_type=False)
 
 
 def upgrade() -> None:
@@ -37,9 +36,7 @@ def upgrade() -> None:
             nullable=False,
             server_default=sa.text("'{}'::jsonb"),
         ),
-        sa.Column(
-            "status", payment_status, nullable=False, server_default=sa.text("'pending'")
-        ),
+        sa.Column("status", payment_status, nullable=False, server_default=sa.text("'pending'")),
         sa.Column("idempotency_key", sa.String(255), nullable=False),
         sa.Column("webhook_url", sa.Text(), nullable=False),
         sa.Column(

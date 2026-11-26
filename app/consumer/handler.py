@@ -45,9 +45,7 @@ class PaymentProcessor:
         async with self._session_factory() as session, session.begin():
             # FOR UPDATE: дубль того же события ждёт здесь и не идёт в шлюз параллельно.
             # Лок держим и во время запроса к шлюзу. Шлюз к тому же идемпотентен по payment_id.
-            payment = await session.scalar(
-                select(Payment).where(Payment.id == payment_id).with_for_update()
-            )
+            payment = await session.scalar(select(Payment).where(Payment.id == payment_id).with_for_update())
             if payment is None:
                 logger.warning("Payment %s not found, dropping message", payment_id)
                 return

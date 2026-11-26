@@ -104,7 +104,9 @@ async def test_gateway_error_keeps_payment_pending():
 
 async def test_webhook_error_is_retryable():
     payment = make_payment()
-    processor = make_processor(payment, FakeGateway(PaymentStatus.SUCCEEDED), FakeWebhook(TransientError("500")))
+    processor = make_processor(
+        payment, FakeGateway(PaymentStatus.SUCCEEDED), FakeWebhook(TransientError("500"))
+    )
 
     with pytest.raises(TransientError):
         await processor.process(payment.id)

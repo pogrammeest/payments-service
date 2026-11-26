@@ -75,7 +75,10 @@ async def handle_payment(event: PaymentCreatedEvent, message: RabbitMessage) -> 
         if attempt < settings.max_attempts:
             logger.warning(
                 "Payment %s attempt %d failed (%r), retry in %d s",
-                event.payment_id, attempt, exc, retry_delay(attempt),
+                event.payment_id,
+                attempt,
+                exc,
+                retry_delay(attempt),
             )
             await broker.publish(
                 event.model_dump(mode="json"),
@@ -86,7 +89,9 @@ async def handle_payment(event: PaymentCreatedEvent, message: RabbitMessage) -> 
                 persist=True,
             )
             return  # оригинал ack'аем, копия ждёт в очереди задержки
-        logger.error("Payment %s failed after %d attempts (%r), moving to DLQ", event.payment_id, attempt, exc)
+        logger.error(
+            "Payment %s failed after %d attempts (%r), moving to DLQ", event.payment_id, attempt, exc
+        )
         raise RejectMessage() from exc
 
 

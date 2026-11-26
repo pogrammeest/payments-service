@@ -19,6 +19,7 @@ dependencies = [
 dev = [
     "pytest>=8.2",
     "pytest-asyncio>=0.23",
+    "black>=24.4",
 ]
 
 [build-system]
@@ -31,3 +32,7 @@ include = ["app*", "gateway_mock*"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+[tool.black]
+line-length = 110
+target-version = ["py312"]

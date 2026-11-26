@@ -33,13 +33,22 @@ def test_error_returns_503_and_is_not_cached(client):
 
 
 def test_same_key_returns_same_result(client):
-    first = client.post("/v1/charges", json=BODY, headers={"Idempotency-Key": "k", "X-Mock-Result": "declined"})
-    second = client.post("/v1/charges", json=BODY, headers={"Idempotency-Key": "k", "X-Mock-Result": "succeeded"})
+    first = client.post(
+        "/v1/charges", json=BODY, headers={"Idempotency-Key": "k", "X-Mock-Result": "declined"}
+    )
+    second = client.post(
+        "/v1/charges", json=BODY, headers={"Idempotency-Key": "k", "X-Mock-Result": "succeeded"}
+    )
     assert first.json() == second.json()
 
 
 def test_success_rate_is_applied(client, monkeypatch):
     monkeypatch.setattr(mock.settings, "success_rate", 1.0)
-    assert client.post("/v1/charges", json=BODY, headers={"Idempotency-Key": "a"}).json()["status"] == "succeeded"
+    assert (
+        client.post("/v1/charges", json=BODY, headers={"Idempotency-Key": "a"}).json()["status"]
+        == "succeeded"
+    )
     monkeypatch.setattr(mock.settings, "success_rate", 0.0)
-    assert client.post("/v1/charges", json=BODY, headers={"Idempotency-Key": "b"}).json()["status"] == "declined"
+    assert (
+        client.post("/v1/charges", json=BODY, headers={"Idempotency-Key": "b"}).json()["status"] == "declined"
+    )
